@@ -4,7 +4,7 @@ from ping3 import ping
 from colorama import just_fix_windows_console
 just_fix_windows_console()
 
-NO_OF_PINGS = 15
+NO_OF_PINGS = 10
 DESTINATION_HOST = "google.com"
 
 
@@ -62,8 +62,8 @@ def main():
                 avg_ping = round(sum(ping_list) / len(ping_list))
                 print(f"\r{BColors.HEADER}current:{BColors.END_C} {int(last_ping):05}ms, "
                       f"{BColors.HEADER}avg:{BColors.END_C} {avg_ping:05}ms, "
-                      f"{BColors.HEADER}quality:{BColors.END_C} {signal_quality(avg_ping, prev_avg)}{BColors.END_C}", end='',
-                      flush=True)
+                      f"{BColors.HEADER}quality:{BColors.END_C} {signal_quality(avg_ping, prev_avg)}{BColors.END_C}",
+                      end='', flush=True)
                 ping_list = ping_list[-NO_OF_PINGS:]
                 prev_avg = avg_ping
             else:
