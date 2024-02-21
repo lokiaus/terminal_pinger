@@ -4,7 +4,7 @@ from ping3 import ping
 from colorama import just_fix_windows_console
 just_fix_windows_console()
 
-NO_OF_PINGS = 10
+NO_OF_PINGS = 15
 DESTINATION_HOST = "google.com"
 
 
@@ -46,6 +46,8 @@ def signal_quality(avg_ping, prev_avg=None):
 def main():
     # logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.DEBUG)
     ping_list = []
+    progress_dots = 0
+    max_dots = NO_OF_PINGS
     prev_avg = None
     while True:
         last_ping = ping(DESTINATION_HOST, unit="ms")
@@ -65,8 +67,10 @@ def main():
                 ping_list = ping_list[-NO_OF_PINGS:]
                 prev_avg = avg_ping
             else:
+                progress_dots = (progress_dots + 1) % (max_dots + 1)
+                progress_str = "x" * progress_dots
                 print(f"\r{BColors.HEADER}current:{BColors.END_C} {int(last_ping):05}ms, "
-                      f"{BColors.HEADER}avg:{BColors.END_C} pinging...", end='', flush=True)
+                      f"{BColors.HEADER}progress:{BColors.END_C} {progress_str}", end='', flush=True)
         time.sleep(0.2)
 
 
