@@ -47,7 +47,7 @@ def main():
     # logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.DEBUG)
     ping_list = []
     progress_dots = 0
-    max_dots = NO_OF_PINGS
+    max_dots = NO_OF_PINGS - 1
     prev_avg = None
     while True:
         last_ping = ping(DESTINATION_HOST, unit="ms")
