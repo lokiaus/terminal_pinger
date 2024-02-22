@@ -34,11 +34,11 @@ def signal_quality(avg_ping, prev_avg=None):
 
     if prev_avg is not None:
         if avg_ping > prev_avg:
-            quality += " ↓"  # Down arrow
+            quality += f"{BColors.FAIL} ↓"  # Down arrow
         elif avg_ping < prev_avg:
-            quality += " ↑"  # Up arrow
+            quality += f"{BColors.OK_GREEN} ↑"  # Up arrow
         else:
-            quality += " -"  # Dash
+            quality += f"{BColors.END_C} -"  # Dash
 
     return quality
 
