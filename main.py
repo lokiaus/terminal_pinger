@@ -36,8 +36,6 @@ def signal_quality(avg_ping, prev_avg=None):
 def main():
     # logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.DEBUG)
     ping_list = []
-    progress_dots = 0
-    max_dots = NO_OF_PINGS - 1
     prev_avg = None
     while True:
         last_ping = ping(DESTINATION_HOST, unit="ms")
@@ -57,8 +55,7 @@ def main():
                 ping_list = ping_list[-NO_OF_PINGS:]
                 prev_avg = avg_ping
             else:
-                progress_dots = (progress_dots + 1) % (max_dots + 1)
-                progress_str = "x" * progress_dots
+                progress_str = f"{len(ping_list)} of {NO_OF_PINGS}"
                 print(f"\r{Fore.LIGHTMAGENTA_EX}current:{Fore.RESET} {int(last_ping):05}ms, "
                       f"{Fore.LIGHTMAGENTA_EX}progress:{Fore.RESET} {progress_str}", end='', flush=True)
         time.sleep(0.2)
