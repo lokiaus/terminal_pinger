@@ -29,9 +29,9 @@ def signal_quality(avg_ping, prev_avg=None):
     if prev_avg:
         trend_arrow = f"{Fore.RESET} -"  # Default is stable
         if avg_ping and prev_avg:  # If both values are valid for comparison
-            if avg_ping > prev_avg:
+            if avg_ping > prev_avg + 2:
                 trend_arrow = f"{Fore.LIGHTRED_EX} ↓"
-            elif avg_ping < prev_avg:
+            elif avg_ping < prev_avg - 2:
                 trend_arrow = f"{Fore.LIGHTGREEN_EX} ↑"
         quality += trend_arrow
 
@@ -48,7 +48,9 @@ def main():
 
             if last_ping == 0.0 or last_ping is None or False:
                 logging.info(f"last_ping: {last_ping}, ping_list: {ping_list}")
-                print(f"\r{Fore.RED}!!!   CONNECTION ERROR:  Host Unreachable   !!!{Fore.RESET}", end='', flush=True)
+                print(f"\r{Fore.LIGHTRED_EX}"
+                      f"!!!   CONNECTION ERROR:  Host Unreachable   !!!"
+                      f"{Fore.RESET}", end='', flush=True)
             else:
                 last_ping = round(last_ping, 1)
                 # logging.info(f"ping_list: {ping_list}")
@@ -68,7 +70,9 @@ def main():
                           f"{Fore.LIGHTMAGENTA_EX}progress:{Fore.RESET} {progress_str}", end='', flush=True)
         except Exception as e:
             logging.exception(f"An unexpected error occurred: {e}")
-            print(f"\r{Fore.RED}!!!An error occurred. Check logs for details!!!{Fore.RESET}", end='', flush=True)
+            print(f"\r{Fore.LIGHTRED_EX}"
+                  f"!!!      UNEXPECTED ERROR:  Check Logs      !!!"
+                  f"{Fore.RESET}", end='', flush=True)
         time.sleep(0.2)
 
 
