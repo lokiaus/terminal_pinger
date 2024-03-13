@@ -53,7 +53,7 @@ def print_status(status_type, **kwargs):
             print_str += (f"{Fore.LIGHTMAGENTA_EX}avg:{Fore.RESET} {avg_ping:05}ms, "
                           f"{Fore.LIGHTMAGENTA_EX}loss:{Fore.RESET} {lc}{loss:03}%{Fore.RESET}, "
                           f"{Fore.LIGHTMAGENTA_EX}quality:{Fore.RESET} "
-                          f"{signal_quality(avg_ping, prev_avg)}{Fore.RESET}")
+                          f"{signal_quality(avg_ping if last_ping else None, prev_avg)}{Fore.RESET}")
         print(print_str, end='', flush=True)
     elif status_type == 'unexpected_error':
         print(f"\r{Fore.LIGHTRED_EX}"
