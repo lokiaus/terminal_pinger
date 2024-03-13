@@ -7,7 +7,7 @@ just_fix_windows_console()
 NO_OF_PINGS = 10
 DESTINATION_HOST = "google.com"
 
-logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.INFO)
+logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.DEBUG)
 
 
 def signal_quality(avg_ping, prev_avg=None):
@@ -75,15 +75,15 @@ def main():
                 losses.append(True)
             else:
                 losses.append(False)
+                ping_list.append(round(last_ping, 1))
+                last_ping = round(last_ping, 1)
             losses = losses[-NO_OF_PINGS:]
             loss = round(int((sum(losses) / NO_OF_PINGS) * 100), 1)
 
-            last_ping = round(last_ping, 1) if last_ping else None
-            ping_list.append(round(last_ping, 1))
             if len(ping_list) >= NO_OF_PINGS:
                 avg_ping = round(sum(ping_list) / len(ping_list))
                 print_status('current_ping',
-                             last_ping=last_ping, avg_ping=avg_ping,
+                             last_ping=last_ping if last_ping else 0, avg_ping=avg_ping,
                              prev_avg=prev_avg, loss=loss)
                 ping_list = ping_list[-NO_OF_PINGS:]
                 prev_avg = avg_ping
