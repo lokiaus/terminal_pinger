@@ -69,10 +69,14 @@ def main():
     """
     Main function to send pings and print the status.
     """
+    no_of_pings = NO_OF_PINGS
+    destination_host = DESTINATION_HOST
     inp = input(f"Number of pings ({NO_OF_PINGS}): ")
-    no_of_pings = int(inp) if inp else NO_OF_PINGS
-    inp = input(f"Target host ({DESTINATION_HOST}): ")
-    destination_host = inp if inp else DESTINATION_HOST
+    if inp.isdigit() and int(inp) > 0:
+        no_of_pings = int(inp)
+        inp = input(f"Target host ({DESTINATION_HOST}): ")
+        if inp:
+            destination_host = inp
 
     logging.info(f"Sending {no_of_pings} pings to {destination_host}")
     ping_list = []
