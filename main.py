@@ -2,16 +2,16 @@ import time
 import logging
 from ping3 import ping
 from colorama import just_fix_windows_console, Fore
-just_fix_windows_console()
 
-NO_OF_PINGS = 10
-DESTINATION_HOST = "google.com"
-
-logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.INFO)
+NO_OF_PINGS = 20  # Number of pings to send
+DESTINATION_HOST = "google.com"  # Destination host to ping
 
 
 def signal_quality(avg_ping, prev_avg=None):
-    if avg_ping is None:  # Indicates an error
+    """
+    Function to determine the quality of the signal based on the average ping time.
+    """
+    if avg_ping is None:
         quality = f"{Fore.LIGHTRED_EX}FAIL"
     elif avg_ping > 150:
         quality = f"{Fore.LIGHTRED_EX}POOR"
@@ -23,13 +23,13 @@ def signal_quality(avg_ping, prev_avg=None):
         quality = f"{Fore.LIGHTGREEN_EX}GOOD"
     elif avg_ping > 0:
         quality = f"{Fore.LIGHTCYAN_EX}BEST"
-    else:  # This wouldn't happen logically
+    else:
         quality = f"{Fore.LIGHTRED_EX}????"
 
-    if prev_avg:
-        trend_threshold = prev_avg * 0.1  # 10% of the previous average
-        trend_arrow = f"{Fore.RESET} -"  # Default is stable
-        if avg_ping and prev_avg:  # If both values are valid for comparison
+    if prev_avg:  # Calculate trend if there is a previous average
+        trend_threshold = prev_avg * 0.1
+        trend_arrow = f"{Fore.RESET} -"
+        if avg_ping and prev_avg:
             if avg_ping > prev_avg + trend_threshold:
                 trend_arrow = f"{Fore.LIGHTRED_EX} ↓"
             elif avg_ping < prev_avg - trend_threshold:
@@ -39,8 +39,11 @@ def signal_quality(avg_ping, prev_avg=None):
     return quality
 
 
-def print_status(status_type, **kwargs):
-    if status_type == 'current_ping':
+def print_status(success, **kwargs):
+    """
+    Function to print the status of the pinging process.
+    """
+    if success:
         last_ping = kwargs['last_ping']
         progress_str = kwargs.get('progress_str')
         print_str = f"\r{Fore.LIGHTMAGENTA_EX}current:{Fore.RESET} {int(last_ping):05}ms, "
@@ -56,47 +59,57 @@ def print_status(status_type, **kwargs):
                           f"{Fore.LIGHTMAGENTA_EX}quality:{Fore.RESET} "
                           f"{signal_quality(avg_ping if last_ping else None, prev_avg)}{Fore.RESET}")
         print(print_str, end='', flush=True)
-    elif status_type == 'unexpected_error':
+    else:
         print(f"\r{Fore.LIGHTRED_EX}"
               f"!!!            UNEXPECTED ERROR:  Check Logs            !!!"
               f"{Fore.RESET}", end='', flush=True)
 
 
 def main():
-    logging.info(f"Sending {NO_OF_PINGS} pings to {DESTINATION_HOST}")
+    """
+    Main function to send pings and print the status.
+    """
+    inp = input(f"Number of pings ({NO_OF_PINGS}): ")
+    no_of_pings = int(inp) if inp else NO_OF_PINGS
+    inp = input(f"Target host ({DESTINATION_HOST}): ")
+    destination_host = inp if inp else DESTINATION_HOST
+
+    logging.info(f"Sending {no_of_pings} pings to {destination_host}")
     ping_list = []
     prev_avg = 0
     losses = []
 
     while True:
         try:
-            last_ping = ping(DESTINATION_HOST, unit="ms")
+            last_ping = ping(destination_host, unit="ms")
 
-            if last_ping == 0.0 or last_ping is None or False:
+            if last_ping == 0.0 or last_ping is None or False:  # Check for loss
                 losses.append(True)
             else:
                 losses.append(False)
                 ping_list.append(round(last_ping, 1))
                 last_ping = round(last_ping, 1)
-            losses = losses[-NO_OF_PINGS:]
-            loss = round(int((sum(losses) / NO_OF_PINGS) * 100), 1)
+            losses = losses[-no_of_pings:]  # Keep only the last NO_OF_PINGS losses
+            loss = round(int((sum(losses) / no_of_pings) * 100), 1)
 
-            if len(ping_list) >= NO_OF_PINGS:
+            if len(ping_list) >= no_of_pings:  # If there are enough pings, calculate the average and print the status
                 avg_ping = round(sum(ping_list) / len(ping_list))
-                print_status('current_ping',
+                print_status(True,
                              last_ping=last_ping if last_ping else 0, avg_ping=avg_ping,
                              prev_avg=prev_avg, loss=loss)
-                ping_list = ping_list[-NO_OF_PINGS:]
+                ping_list = ping_list[-no_of_pings:]  # Keep only the last NO_OF_PINGS pings
                 prev_avg = avg_ping
             else:
-                progress_str = f"{len(ping_list)} of {NO_OF_PINGS}"
-                print_status('current_ping',
+                progress_str = f"{len(ping_list)} of {no_of_pings}"
+                print_status(True,
                              last_ping=last_ping, progress_str=progress_str)
         except Exception as e:
             logging.exception(f"An unexpected error occurred: {e}")
-            print_status('unexpected_error')
+            print_status(False)
         time.sleep(0.2)
 
 
 if __name__ == '__main__':
+    just_fix_windows_console()  # Fix console for Windows
+    logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.INFO)  # Set up logging
     main()
