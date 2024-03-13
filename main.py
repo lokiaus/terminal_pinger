@@ -7,7 +7,7 @@ just_fix_windows_console()
 NO_OF_PINGS = 10
 DESTINATION_HOST = "google.com"
 
-logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.INFO)
 
 
 def signal_quality(avg_ping, prev_avg=None):
