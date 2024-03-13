@@ -27,11 +27,12 @@ def signal_quality(avg_ping, prev_avg=None):
         quality = f"{Fore.LIGHTRED_EX}????"
 
     if prev_avg:
+        trend_threshold = prev_avg * 0.1  # 10% of the previous average
         trend_arrow = f"{Fore.RESET} -"  # Default is stable
         if avg_ping and prev_avg:  # If both values are valid for comparison
-            if avg_ping > prev_avg + 2:
+            if avg_ping > prev_avg + trend_threshold:
                 trend_arrow = f"{Fore.LIGHTRED_EX} ↓"
-            elif avg_ping < prev_avg - 2:
+            elif avg_ping < prev_avg - trend_threshold:
                 trend_arrow = f"{Fore.LIGHTGREEN_EX} ↑"
         quality += trend_arrow
 
