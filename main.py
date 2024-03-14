@@ -10,6 +10,13 @@ DESTINATION_HOST = "google.com"  # Destination host to ping
 def signal_quality(avg_ping, prev_avg=None):
     """
     Function to determine the quality of the signal based on the average ping time.
+
+    Parameters:
+    avg_ping (float): The average ping time in milliseconds.
+    prev_avg (float, optional): The previous average ping time in milliseconds. Default is None.
+
+    Returns:
+    str: A string representing the quality of the signal and the trend arrow.
     """
     if avg_ping is None:
         quality = f"{Fore.LIGHTRED_EX}FAIL"
@@ -41,7 +48,17 @@ def signal_quality(avg_ping, prev_avg=None):
 
 def print_status(success, **kwargs):
     """
-    Function to print the status of the pinging process.
+    Function to print the status message.
+
+    Parameters:
+    success (bool): A boolean indicating whether the operation was successful.
+    **kwargs: Variable length argument list containing the following optional arguments:
+        - last_ping (float): The last recorded ping time in milliseconds.
+        - progress_str (str): A string representing the progress of the operation.
+        - avg_ping (float): The average ping time in milliseconds.
+        - prev_avg (float): The previous average ping time in milliseconds.
+        - loss (float): The percentage of packet loss.
+
     """
     if success:
         last_ping = kwargs['last_ping']
@@ -67,7 +84,12 @@ def print_status(success, **kwargs):
 
 def main():
     """
-    Main function to send pings and print the status.
+    Main function to handle inputs and send and process pings.
+
+    The function prompts the user for the number of pings and the target host.
+    It then sends the specified number of pings to the target host,
+    calculates the average ping time, and prints the status message.
+
     """
     no_of_pings = NO_OF_PINGS
     destination_host = DESTINATION_HOST
@@ -96,17 +118,15 @@ def main():
             losses = losses[-no_of_pings:]  # Keep only the last NO_OF_PINGS losses
             loss = round(int((sum(losses) / no_of_pings) * 100), 1)
 
-            if len(ping_list) >= no_of_pings:  # If there are enough pings, calculate the average and print the status
+            if len(ping_list) >= no_of_pings:  # If there are enough pings, calculate average and print status
                 avg_ping = round(sum(ping_list) / len(ping_list))
-                print_status(True,
-                             last_ping=last_ping if last_ping else 0, avg_ping=avg_ping,
-                             prev_avg=prev_avg, loss=loss)
+                print_status(True, last_ping=last_ping if last_ping else 0,
+                             avg_ping=avg_ping, prev_avg=prev_avg, loss=loss)
                 ping_list = ping_list[-no_of_pings:]  # Keep only the last NO_OF_PINGS pings
                 prev_avg = avg_ping
             else:
                 progress_str = f"{len(ping_list)} of {no_of_pings}"
-                print_status(True,
-                             last_ping=last_ping, progress_str=progress_str)
+                print_status(True, last_ping=last_ping, progress_str=progress_str)
         except Exception as e:
             logging.exception(f"An unexpected error occurred: {e}")
             print_status(False)
