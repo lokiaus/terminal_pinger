@@ -7,41 +7,59 @@ NO_OF_PINGS = 20  # Number of pings to send
 DESTINATION_HOST = "google.com"  # Destination host to ping
 
 
-def signal_quality(avg_ping, prev_avg=None):
+def get_trend(avg_ping, prev_avg=None):
     """
-    Function to determine the quality of the signal based on the average ping time.
+    Function to determine the trend based on the average ping time.
 
     Parameters:
     avg_ping (float): The average ping time in milliseconds.
     prev_avg (float, optional): The previous average ping time in milliseconds. Default is None.
 
     Returns:
-    str: A string representing the quality of the signal and the trend arrow.
+    str: A string representing the trend arrow.
     """
     if avg_ping is None:
-        quality = f"{Fore.LIGHTRED_EX}FAIL"
-    elif avg_ping > 150:
-        quality = f"{Fore.LIGHTRED_EX}POOR"
-    elif avg_ping > 100:
-        quality = f"{Fore.YELLOW}POOR"
-    elif avg_ping > 50:
-        quality = f"{Fore.LIGHTGREEN_EX}FINE"
-    elif avg_ping > 20:
-        quality = f"{Fore.LIGHTGREEN_EX}GOOD"
-    elif avg_ping > 0:
-        quality = f"{Fore.LIGHTCYAN_EX}BEST"
-    else:
-        quality = f"{Fore.LIGHTRED_EX}????"
+        return f"{Fore.LIGHTRED_EX}  X"
+    if prev_avg is None or avg_ping == prev_avg:
+        return f"{Fore.RESET}  -"
 
-    if prev_avg:  # Calculate trend if there is a previous average
-        trend_threshold = prev_avg * 0.1
-        trend_arrow = f"{Fore.RESET} -"
-        if avg_ping and prev_avg:
-            if avg_ping > prev_avg + trend_threshold:
-                trend_arrow = f"{Fore.LIGHTRED_EX} ↓"
-            elif avg_ping < prev_avg - trend_threshold:
-                trend_arrow = f"{Fore.LIGHTGREEN_EX} ↑"
-        quality += trend_arrow
+    change = avg_ping - prev_avg
+
+    thresholds = [
+        (-prev_avg * 0.3, f"{Fore.LIGHTCYAN_EX} ↑↑"),
+        (-prev_avg * 0.2, f"{Fore.LIGHTCYAN_EX}  ↑"),
+        (-prev_avg * 0.1, f"{Fore.LIGHTGREEN_EX}  ↑"),
+        (0, f"{Fore.RESET}  ↑"),
+        (prev_avg * 0.1, f"{Fore.RESET}  ↓"),
+        (prev_avg * 0.2, f"{Fore.LIGHTYELLOW_EX}  ↓"),
+        (prev_avg * 0.3, f"{Fore.LIGHTRED_EX}  ↓"),
+        (float('inf'), f"{Fore.LIGHTRED_EX} ↓↓")
+    ]
+
+    for threshold, trend in thresholds:
+        if change < threshold:
+            return trend
+
+    return f"{Fore.RESET}  -"
+
+
+def signal_quality(avg_ping):
+    """
+    Function to determine the quality of the signal based on the average ping time.
+
+    Parameters:
+    avg_ping (float): The average ping time in milliseconds.
+
+    Returns:
+    str: A string representing the quality of the signal.
+    """
+    quality = (f"{Fore.LIGHTRED_EX}FAIL" if avg_ping is None else
+               f"{Fore.LIGHTRED_EX}POOR" if avg_ping > 150 else
+               f"{Fore.YELLOW}POOR" if avg_ping > 100 else
+               f"{Fore.LIGHTGREEN_EX}FINE" if avg_ping > 50 else
+               f"{Fore.LIGHTGREEN_EX}GOOD" if avg_ping > 20 else
+               f"{Fore.LIGHTCYAN_EX}BEST" if avg_ping > 0 else
+               f"{Fore.LIGHTRED_EX}????")
 
     return quality
 
@@ -70,11 +88,12 @@ def print_status(success, **kwargs):
             avg_ping = kwargs['avg_ping']
             prev_avg = kwargs['prev_avg']
             loss = kwargs['loss']
-            lc = Fore.LIGHTRED_EX if loss > 50 else Fore.LIGHTGREEN_EX if loss < 10 else Fore.LIGHTYELLOW_EX
+            lc = Fore.LIGHTRED_EX if loss > 30 else Fore.LIGHTYELLOW_EX if loss > 0 else Fore.LIGHTGREEN_EX
             print_str += (f"{Fore.LIGHTMAGENTA_EX}avg:{Fore.RESET} {avg_ping:05}ms, "
                           f"{Fore.LIGHTMAGENTA_EX}loss:{Fore.RESET} {lc}{loss:03}%{Fore.RESET}, "
                           f"{Fore.LIGHTMAGENTA_EX}quality:{Fore.RESET} "
-                          f"{signal_quality(avg_ping if last_ping else None, prev_avg)}{Fore.RESET}")
+                          f"{signal_quality(avg_ping if last_ping else None)}"
+                          f"{get_trend(avg_ping, prev_avg)}{Fore.RESET} ")
         print(print_str, end='', flush=True)
     else:
         print(f"\r{Fore.LIGHTRED_EX}"
@@ -97,8 +116,7 @@ def main():
     if inp.isdigit() and int(inp) > 0:
         no_of_pings = int(inp)
         inp = input(f"Target host ({DESTINATION_HOST}): ")
-        if inp:
-            destination_host = inp
+        destination_host = inp if inp else DESTINATION_HOST
 
     logging.info(f"Sending {no_of_pings} pings to {destination_host}")
     ping_list = []
