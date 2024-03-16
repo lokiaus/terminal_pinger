@@ -93,7 +93,7 @@ def print_status(success, **kwargs):
                           f"{Fore.LIGHTMAGENTA_EX}loss:{Fore.RESET} {lc}{loss:03}%{Fore.RESET}, "
                           f"{Fore.LIGHTMAGENTA_EX}quality:{Fore.RESET} "
                           f"{signal_quality(avg_ping if last_ping else None)}"
-                          f"{get_trend(avg_ping, prev_avg)}{Fore.RESET} ")
+                          f"{get_trend(avg_ping if last_ping else None, prev_avg)}{Fore.RESET} ")
         print(print_str, end='', flush=True)
     else:
         print(f"\r{Fore.LIGHTRED_EX}"
