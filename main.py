@@ -120,27 +120,27 @@ def main():
 
     logging.info(f"Sending {no_of_pings} pings to {destination_host}")
     ping_list = []
-    prev_avg = 0
     losses = []
+    prev_avg = 0
 
     while True:
         try:
             last_ping = ping(destination_host, unit="ms")
 
-            if last_ping == 0.0 or last_ping is None or False:  # Check for loss
-                losses.append(True)
-            else:
-                losses.append(False)
-                ping_list.append(round(last_ping, 1))
-                last_ping = round(last_ping, 1)
+            is_loss = last_ping == 0.0 or last_ping is None or False  # Check for loss
+            losses.append(is_loss)
             losses = losses[-no_of_pings:]  # Keep only the last NO_OF_PINGS losses
-            loss = round(int((sum(losses) / no_of_pings) * 100), 1)
+
+            if not is_loss:
+                ping_list.append(round(last_ping, 1))
+                ping_list = ping_list[-no_of_pings:]  # Keep only the last NO_OF_PINGS pings
+                last_ping = round(last_ping, 1)
 
             if len(ping_list) >= no_of_pings:  # If there are enough pings, calculate average and print status
+                loss = round(int((sum(losses) / no_of_pings) * 100), 1)
                 avg_ping = round(sum(ping_list) / len(ping_list))
                 print_status(True, last_ping=last_ping if last_ping else 0,
                              avg_ping=avg_ping, prev_avg=prev_avg, loss=loss)
-                ping_list = ping_list[-no_of_pings:]  # Keep only the last NO_OF_PINGS pings
                 prev_avg = avg_ping
             else:
                 progress_str = f"{len(ping_list)} of {no_of_pings}"
