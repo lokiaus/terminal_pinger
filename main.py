@@ -54,13 +54,13 @@ def signal_quality(avg_ping) -> str:
     Returns:
     str: A string representing the quality of the signal.
     """
-    quality = (f"{Fore.LIGHTRED_EX}FAIL" if avg_ping is None else
-               f"{Fore.LIGHTRED_EX}POOR" if avg_ping > 150 else
-               f"{Fore.YELLOW}POOR" if avg_ping > 100 else
-               f"{Fore.LIGHTGREEN_EX}FINE" if avg_ping > 50 else
-               f"{Fore.LIGHTGREEN_EX}GOOD" if avg_ping > 20 else
-               f"{Fore.LIGHTCYAN_EX}BEST" if avg_ping > 0 else
-               f"{Fore.LIGHTRED_EX}????")
+    quality: str = (f"{Fore.LIGHTRED_EX}FAIL" if avg_ping is None else
+                    f"{Fore.LIGHTRED_EX}POOR" if avg_ping > 150 else
+                    f"{Fore.YELLOW}POOR" if avg_ping > 100 else
+                    f"{Fore.LIGHTGREEN_EX}FINE" if avg_ping > 50 else
+                    f"{Fore.LIGHTGREEN_EX}GOOD" if avg_ping > 20 else
+                    f"{Fore.LIGHTCYAN_EX}BEST" if avg_ping > 0 else
+                    f"{Fore.LIGHTRED_EX}????")
 
     return quality
 
@@ -119,10 +119,15 @@ def main() -> None:
         inp = input(f"Target host ({DESTINATION_HOST}): ")
         destination_host = inp if inp else DESTINATION_HOST
 
-    logging.info(f"Sending {no_of_pings} pings to {destination_host}")
     ping_list: list[float] = []
     losses: list[bool] = []
-    prev_avg: float = 0.0
+    prev_avg: None = None
+    
+    logging.info(f"Sending {no_of_pings} pings to {destination_host}")
+    progress_str: str = f"0 of {no_of_pings}"
+    print_status(True, last_ping=0, progress_str=progress_str)
+    
+    time.sleep(0.2)
 
     while True:
         try:
@@ -141,7 +146,7 @@ def main() -> None:
                 avg_ping: float = sum(ping_list) / len(ping_list)
                 print_status(True, last_ping=last_ping if last_ping else 0,
                              avg_ping=avg_ping, prev_avg=prev_avg, loss=loss)
-                prev_avg = avg_ping
+                prev_avg: float = avg_ping
             else:
                 progress_str: str = f"{len(ping_list)} of {no_of_pings}"
                 print_status(True, last_ping=last_ping, progress_str=progress_str)
