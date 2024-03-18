@@ -9,15 +9,17 @@
 - Tracks and displays the percentage of packet loss.
 - Provides a quality indicator based on the average ping time and previous average ping time.
 - Handles unexpected errors gracefully and logs them for further investigation.
+- Colorizes console output for better readability.
 
 ## Usage
 
 To use `terminal_pinger`, follow these steps:
 
-1. Run the `main.py` script in your terminal.
-2. When prompted, enter the number of pings you wish to send. If you press enter without providing a number, the default number of pings will be used.
-3. Next, enter the target host you wish to ping. If you press enter without providing a host, the default host will be used.
-4. The script will then begin sending pings to the target host and display real-time updates on the operation's progress.
+1. Install the required dependencies by running `pip install -r requirements.txt` in your terminal.
+2. Run the `main.py` script in your terminal.
+3. When prompted, enter the number of pings you wish to send. If you press enter without providing a number, the default number of pings will be used.
+4. Next, enter the target host you wish to ping. If you press enter without providing a host, the default host will be used.
+5. The script will then begin sending pings to the target host and display real-time updates on the operation's progress.
 
 ## Code Structure
 
@@ -36,6 +38,8 @@ The main functions in the `main.py` script are:
 
 - Python 3.6 or higher
 - Windows operating system
+- colorama library
+- ping3 library
 
 ## Contributing
 
