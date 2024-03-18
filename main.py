@@ -25,20 +25,21 @@ def get_trend(avg_ping, prev_avg=None) -> str:
 
     change: float = avg_ping - prev_avg
 
-    thresholds = [
-        (-prev_avg * 0.3, f"{Fore.LIGHTCYAN_EX} ↑↑"),
-        (-prev_avg * 0.2, f"{Fore.LIGHTCYAN_EX}  ↑"),
-        (-prev_avg * 0.1, f"{Fore.LIGHTGREEN_EX}  ↑"),
-        (0, f"{Fore.RESET}  ↑"),
-        (prev_avg * 0.1, f"{Fore.RESET}  ↓"),
-        (prev_avg * 0.2, f"{Fore.LIGHTYELLOW_EX}  ↓"),
-        (prev_avg * 0.3, f"{Fore.LIGHTRED_EX}  ↓"),
-        (float('inf'), f"{Fore.LIGHTRED_EX} ↓↓")
-    ]
+    if abs(change) > 0.5:
+        thresholds: list[tuple] = [
+            (-prev_avg * 0.3, f"{Fore.LIGHTCYAN_EX} ↑↑"),
+            (-prev_avg * 0.2, f"{Fore.LIGHTCYAN_EX}  ↑"),
+            (-prev_avg * 0.1, f"{Fore.LIGHTGREEN_EX}  ↑"),
+            (0, f"{Fore.RESET}  ↑"),
+            (prev_avg * 0.1, f"{Fore.RESET}  ↓"),
+            (prev_avg * 0.2, f"{Fore.LIGHTYELLOW_EX}  ↓"),
+            (prev_avg * 0.3, f"{Fore.LIGHTRED_EX}  ↓"),
+            (float('inf'), f"{Fore.LIGHTRED_EX} ↓↓")
+        ]
 
-    for threshold, trend in thresholds:
-        if change < threshold:
-            return trend
+        for threshold, trend in thresholds:
+            if change < threshold:
+                return trend
 
     return f"{Fore.RESET}  -"
 
@@ -132,12 +133,11 @@ def main() -> None:
             losses = losses[-no_of_pings:]  # Keep only the last NO_OF_PINGS losses
 
             if not is_loss:
-                ping_list.append(round(last_ping, 1))
+                ping_list.append(last_ping)
                 ping_list = ping_list[-no_of_pings:]  # Keep only the last NO_OF_PINGS pings
-                last_ping = round(last_ping, 1)
 
             if len(ping_list) >= no_of_pings:  # If there are enough pings, calculate average and print status
-                loss: int = round(int((sum(losses) / no_of_pings) * 100), 1)
+                loss: int = int(sum(losses) / no_of_pings * 100)
                 avg_ping: float = sum(ping_list) / len(ping_list)
                 print_status(True, last_ping=last_ping if last_ping else 0,
                              avg_ping=avg_ping, prev_avg=prev_avg, loss=loss)
