@@ -121,7 +121,7 @@ def main() -> None:
 
     ping_list: list[float] = []
     losses: list[bool] = []
-    prev_avg: None = None
+    prev_avg: float = 0.0
     
     logging.info(f"Sending {no_of_pings} pings to {destination_host}")
     progress_str: str = f"0 of {no_of_pings}"
@@ -146,7 +146,7 @@ def main() -> None:
                 avg_ping: float = sum(ping_list) / len(ping_list)
                 print_status(True, last_ping=last_ping if last_ping else 0,
                              avg_ping=avg_ping, prev_avg=prev_avg, loss=loss)
-                prev_avg: float = avg_ping
+                prev_avg = avg_ping
             else:
                 progress_str: str = f"{len(ping_list)} of {no_of_pings}"
                 print_status(True, last_ping=last_ping, progress_str=progress_str)
@@ -158,5 +158,5 @@ def main() -> None:
 
 if __name__ == '__main__':
     just_fix_windows_console()  # Fix console for Windows
-    logging.basicConfig(filename='pinger.log', encoding='utf-8', level=logging.INFO)  # Set up logging
+    logging.basicConfig(filename='pinger.log', level=logging.DEBUG)  # Set up logging
     main()
