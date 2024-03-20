@@ -56,7 +56,7 @@ def signal_quality(avg_ping) -> str:
     """
     quality: str = (f"{Fore.LIGHTRED_EX}FAIL" if avg_ping is None else
                     f"{Fore.LIGHTRED_EX}POOR" if avg_ping > 150 else
-                    f"{Fore.YELLOW}POOR" if avg_ping > 100 else
+                    f"{Fore.LIGHTYELLOW_EX}POOR" if avg_ping > 100 else
                     f"{Fore.LIGHTGREEN_EX}FINE" if avg_ping > 50 else
                     f"{Fore.LIGHTGREEN_EX}GOOD" if avg_ping > 20 else
                     f"{Fore.LIGHTCYAN_EX}BEST" if avg_ping > 0 else
