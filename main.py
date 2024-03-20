@@ -7,7 +7,7 @@ NO_OF_PINGS: int = 20  # Number of pings to send
 DESTINATION_HOST: str = "google.com"  # Destination host to ping
 
 
-def get_trend(avg_ping, prev_avg=None) -> str:
+def get_trend(avg_ping: float, prev_avg: float = None) -> str:
     """
     Function to determine the trend based on the average ping time.
 
@@ -44,7 +44,7 @@ def get_trend(avg_ping, prev_avg=None) -> str:
     return f"{Fore.RESET}  -"
 
 
-def signal_quality(avg_ping) -> str:
+def signal_quality(avg_ping: float) -> str:
     """
     Function to determine the quality of the signal based on the average ping time.
 
@@ -65,7 +65,7 @@ def signal_quality(avg_ping) -> str:
     return quality
 
 
-def print_status(success, **kwargs) -> None:
+def print_status(success: bool, **kwargs) -> None:
     """
     Function to print the status message.
 
@@ -76,19 +76,19 @@ def print_status(success, **kwargs) -> None:
         - progress_str (str): A string representing the progress of the operation.
         - avg_ping (float): The average ping time in milliseconds.
         - prev_avg (float): The previous average ping time in milliseconds.
-        - loss (float): The percentage of packet loss.
+        - loss (int): The percentage of packet loss.
 
     """
     if success:
-        last_ping = kwargs['last_ping']
-        progress_str = kwargs.get('progress_str')
+        last_ping: float = kwargs['last_ping']
+        progress_str: str = kwargs.get('progress_str')
         print_str: str = f"\r{Fore.LIGHTMAGENTA_EX}current:{Fore.RESET} {last_ping:05.0f}ms, "
         if progress_str:
             print_str += f"{Fore.LIGHTMAGENTA_EX}progress:{Fore.RESET} {progress_str}"
         else:
-            avg_ping = kwargs['avg_ping']
-            prev_avg = kwargs['prev_avg']
-            loss = kwargs['loss']
+            avg_ping: float = kwargs['avg_ping']
+            prev_avg: float = kwargs['prev_avg']
+            loss: int = kwargs['loss']
             lc = Fore.LIGHTRED_EX if loss > 30 else Fore.LIGHTYELLOW_EX if loss > 0 else Fore.LIGHTGREEN_EX
             print_str += (f"{Fore.LIGHTMAGENTA_EX}avg:{Fore.RESET} {avg_ping:05.0f}ms, "
                           f"{Fore.LIGHTMAGENTA_EX}loss:{Fore.RESET} {lc}{loss:03}%{Fore.RESET}, "
@@ -149,7 +149,7 @@ def main() -> None:
                 prev_avg = avg_ping
             else:
                 progress_str: str = f"{len(ping_list)} of {no_of_pings}"
-                print_status(True, last_ping=last_ping, progress_str=progress_str)
+                print_status(True, last_ping=last_ping if last_ping else 0, progress_str=progress_str)
         except Exception as e:
             logging.exception(f"An unexpected error occurred: {e}")
             print_status(False)
